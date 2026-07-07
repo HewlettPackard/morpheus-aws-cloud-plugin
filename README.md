@@ -6,7 +6,7 @@ This plugin provides a full integration between [Amazon Web Services](https://aw
 
 | Component | Minimum Version |
 |-----------|-----------------|
-| Morpheus | 8.0.0 |
+| Morpheus | 9.1.0 |
 | Java (build) | 11 |
 
 An AWS account with programmatic access (Access Key / Secret Key) or an EC2 instance role with the appropriate IAM permissions is required.
