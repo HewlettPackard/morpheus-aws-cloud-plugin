@@ -54,6 +54,16 @@ dependencies {
 	provided("com.bertramlabs.plugins:karman-core:${karmanVersion}") {
 		exclude module: 'groovy-all'
 	}
+
+	constraints {
+		// MORPH-19064: ant 1.9.15 (via karman-aws -> groovy-all -> groovy-ant) has CVE-2020-11979, CVE-2021-36373, CVE-2021-36374; 1.10.11 is the lowest release fixing all three
+		implementation('org.apache.ant:ant:1.10.11') {
+			because 'MORPH-19064 CVE-2020-11979, CVE-2021-36373, CVE-2021-36374'
+		}
+		implementation('org.apache.ant:ant-launcher:1.10.11') {
+			because 'MORPH-19064 keep aligned with ant'
+		}
+	}
         implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.1'
         implementation 'com.fasterxml.jackson.core:jackson-annotations:2.15.1'
         implementation 'com.fasterxml.jackson.core:jackson-core:2.15.1'
