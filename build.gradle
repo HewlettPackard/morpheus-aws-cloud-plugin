@@ -64,6 +64,14 @@ dependencies {
 			because 'MORPH-19064 keep aligned with ant'
 		}
 	}
+	constraints {
+		implementation('org.testng:testng:7.5.1') {
+			because 'CVE-2022-4065 via groovy-all -> groovy-testng'
+		}
+		provided('org.testng:testng:7.5.1') {
+			because 'CVE-2022-4065 via groovy-all -> groovy-testng'
+		}
+	}
         implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.1'
         implementation 'com.fasterxml.jackson.core:jackson-annotations:2.15.1'
         implementation 'com.fasterxml.jackson.core:jackson-core:2.15.1'
