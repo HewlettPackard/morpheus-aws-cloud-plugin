@@ -66,7 +66,7 @@ dependencies {
 	}
 	constraints {
 		implementation('org.testng:testng:7.5.1') {
-			because 'CVE-2022-4065 via groovy-all -> groovy-testng'
+			because 'CVE-2022-4065 via groovy-all -> groovy-testng; first patched in 7.5.1 per GHSA-rc2q-x9mf-w3vf'
 		}
 		provided('org.testng:testng:7.5.1') {
 			because 'CVE-2022-4065 via groovy-all -> groovy-testng'
