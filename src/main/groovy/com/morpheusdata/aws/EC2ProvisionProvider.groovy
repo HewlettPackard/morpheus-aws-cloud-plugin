@@ -638,6 +638,10 @@ class EC2ProvisionProvider extends AbstractProvisionProvider implements VmProvis
 				workload.server.sourceImage = virtualImage
 				VirtualImageLocation location = ensureVirtualImageLocation(amazonClient,server.resourcePool.regionCode,virtualImage,server.cloud)
 				resp.data.setVirtualImageLocation(location)
+				if(virtualImage.osType?.platform == 'windows' && launchAgentAppliesHostname(virtualImage)) {
+					// core builds the user data, so ask it to rename before installing the agent
+					resp.data.options.renameBeforeAgent = true
+				}
 			}
 			resp.success = true
 		} else {
@@ -730,6 +734,9 @@ class EC2ProvisionProvider extends AbstractProvisionProvider implements VmProvis
 			amazonClient = plugin.getAmazonClient(cloud,false, server.resourcePool.regionCode)
 			def runConfig = buildWorkloadRunConfig(workload, workloadRequest, virtualImage, amazonClient, opts)
 			runVirtualMachine(runConfig, provisionResponse, opts + [amazonClient: amazonClient])
+			if(runConfig.osType == 'windows' && launchAgentAppliesHostname(virtualImage)) {
+				provisionResponse.unattendCustomized = true // reused for user data renames, as in buildCloudbaseInitUserData
+			}
 			log.info("Checking Server Interfaces....")
 			workload.server.interfaces?.each { netInt ->
 				log.info("Net Interface: ${netInt.id} -> Network: ${netInt.network?.id}")
@@ -1822,6 +1829,15 @@ class EC2ProvisionProvider extends AbstractProvisionProvider implements VmProvis
 
 	protected saveAccountImage(AmazonEC2 amazonClient, account, zone, String regionCode, publicImageId, sourceImage = null) {
 	 return saveAccountImage(amazonClient, account, zone, regionCode, publicImageId, morpheusContext, sourceImage)
+	}
+
+	/**
+	 * EC2Launch v2 honours the user data's exit 3010, so it applies the hostname and restarts itself.
+	 * When the image is flagged as v2, Morpheus skips its own rename and reboot. Sysprep and forced
+	 * customization images still need the Morpheus restart.
+	 */
+	protected static Boolean launchAgentAppliesHostname(VirtualImage image) {
+		image?.getConfigProperty('ec2LaunchVersion') == 'v2' && !image.isSysprep && !image.isForceCustomization
 	}
 
 	static saveAccountImage(AmazonEC2 amazonClient, account, zone, String regionCode, publicImageId, MorpheusContext morpheus, sourceImage = null) {
